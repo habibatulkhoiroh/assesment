@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Game Diriku – Aku Sudah Besar</title>
+
+<style>
+
+/* =========================
+BACKGROUND RAMAH ANAK
+========================= */
+
+body{
+font-family:"Comic Sans MS", sans-serif;
+margin:0;
+text-align:center;
+
+/* langit + awan */
+
+background:linear-gradient(#87CEFA,#E0F7FA);
+min-height:100vh;
+}
+
+/* awan dekorasi */
+
+body::before{
+content:"☁ ☁ ☁ ☁ ☁";
+font-size:70px;
+position:absolute;
+bottom:100px;
+left:0;
+width:100%;
+opacity:0.4;
+}
+
+/* =========================
+LAYOUT
+========================= */
+
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+h1{
+color:#ff7043;
+}
+
+.question{
+font-size:24px;
+margin:20px 0;
+}
+
+/* =========================
+TOMBOL
+========================= */
+
+button{
+font-size:22px;
+padding:15px 30px;
+border:none;
+border-radius:20px;
+background:#4CAF50;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#43a047;
+}
+
+/* =========================
+PILIHAN GAMBAR
+========================= */
+
+.choices{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.choice{
+width:200px;
+background:white;
+border-radius:20px;
+padding:10px;
+cursor:pointer;
+box-shadow:0 6px 12px rgba(0,0,0,0.15);
+transition:0.2s;
+}
+
+.choice:hover{
+transform:scale(1.05);
+}
+
+.choice img{
+width:100%;
+height: 70%;
+}
+
+.choice p{
+font-size:18px;
+justify-content: center;
+align-items: center;
+}
+
+/* =========================
+ANIMASI BENAR SALAH
+========================= */
+
+.correct{
+animation:correctAnim .5s;
+}
+
+.wrong{
+animation:wrongAnim .5s;
+}
+
+@keyframes correctAnim{
+0%{background:#a5d6a7;}
+100%{background:white;}
+}
+
+@keyframes wrongAnim{
+0%{background:#ef9a9a;}
+100%{background:white;}
+}
+
+/* =========================
+DRAG
+========================= */
+
+.drag-container{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.drag-item{
+width:150px;
+background:white;
+padding:10px;
+border-radius:20px;
+cursor:grab;
+box-shadow:0 6px 12px rgba(0,0,0,0.15);
+}
+
+.drag-item img{
+width:100%;
+height: 70%;
+}
+
+/* =========================
+BINTANG SKOR
+========================= */
+
+.stars{
+font-size:50px;
+margin:20px;
+color:#FFD700;
+}
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media(max-width:600px){
+
+.choice{
+width:140px;
+}
+
+.drag-item{
+width:110px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+
+/* =========================
+VARIABEL GAME
+========================= */
+
+let level=0
+let score=0
+
+/* =========================
+DATA LEVEL
+========================= */
+
+const levels=[
+
+{
+question:"Mana anak yang sudah besar?",
+options:[
+{img:"bayi.jpg",text:"Bayi",correct:false},
+{img:"tk.jpg",text:"Anak-anak",correct:true}
+]
+},
+
+{
+question:"Mana anak yang sudah mandiri?",
+options:[
+{img:"makan.jpg",text:"Makan sendiri",correct:true},
+{img:"disuapi.jpg",text:"Disuapi",correct:false}
+]
+},
+
+{
+question:"Kalau sudah besar, aku pergi ke mana?",
+options:[
+{img:"sekolah.jpg",text:"Sekolah",correct:true},
+{img:"kamar.jpg",text:"Kamar",correct:false}
+]
+},
+
+{
+question:"Kalau sudah besar, aku bisa memakai apa?",
+options:[
+{img:"sepatu.jpg",text:"Sepatu",correct:true},
+{img:"dot.jpg",text:"Dot bayi",correct:false}
+]
+}
+
+]
+
+/* =========================
+MENU
+========================= */
+
+function showMenu(){
+
+document.getElementById("app").innerHTML=`
+
+<h1>Game Diriku – Aku Sudah Besar</h1>
+
+<br>
+
+<button onclick="startGame()">Mulai Game</button>
+
+`
+
+}
+
+showMenu()
+
+/* =========================
+START GAME
+========================= */
+
+function startGame(){
+
+level=0
+score=0
+showLevel()
+
+}
+
+/* =========================
+LEVEL
+========================= */
+
+function showLevel(){
+
+if(level<4){
+
+let data=levels[level]
+
+let html=`
+
+<h2>Level ${level+1}</h2>
+
+<div class="question">${data.question}</div>
+
+<div class="choices">
+
+`
+
+data.options.forEach(opt=>{
+
+html+=`
+
+<div class="choice" onclick="checkAnswer(${opt.correct},this)">
+
+<img src="${opt.img}">
+
+<p>${opt.text}</p>
+
+</div>
+
+`
+
+})
+
+html+=`</div>`
+
+document.getElementById("app").innerHTML=html
+
+}
+
+else{
+
+showDrag()
+
+}
+
+}
+
+/* =========================
+CEK JAWABAN
+========================= */
+
+function checkAnswer(correct,el){
+
+if(correct){
+
+score++
+el.classList.add("correct")
+
+}else{
+
+el.classList.add("wrong")
+
+}
+
+setTimeout(()=>{
+
+level++
+showLevel()
+
+},700)
+
+}
+
+/* =========================
+LEVEL DRAG
+========================= */
+
+function showDrag(){
+
+document.getElementById("app").innerHTML=`
+
+<h2>Level 5</h2>
+
+<div class="question">Urutkan dari yang paling kecil sampai yang sudah besar</div>
+
+<div class="drag-container" id="dragArea">
+
+<div class="drag-item" draggable="true" data-order="3">
+<img src="tk.jpg">
+<p>Anak TK</p>
+</div>
+
+<div class="drag-item" draggable="true" data-order="1">
+<img src="bayi.jpg">
+<p>Bayi</p>
+</div>
+
+<div class="drag-item" draggable="true" data-order="2">
+<img src="balita.jpg">
+<p>Balita</p>
+</div>
+
+</div>
+
+<br>
+
+<button onclick="checkOrder()">Cek Jawaban</button>
+
+`
+
+enableDrag()
+
+}
+
+/* =========================
+DRAG SYSTEM
+========================= */
+
+function enableDrag(){
+
+let dragItem=null
+const items=document.querySelectorAll(".drag-item")
+const container=document.getElementById("dragArea")
+
+items.forEach(item=>{
+
+item.addEventListener("dragstart",()=>{
+
+dragItem=item
+
+})
+
+item.addEventListener("dragover",e=>{
+
+e.preventDefault()
+
+})
+
+item.addEventListener("drop",()=>{
+
+container.insertBefore(dragItem,item)
+
+})
+
+})
+
+}
+
+/* =========================
+CEK URUTAN
+========================= */
+
+function checkOrder(){
+
+const items=document.querySelectorAll(".drag-item")
+
+let correct=true
+
+items.forEach((item,i)=>{
+
+if(parseInt(item.dataset.order)!==(i+1)){
+
+correct=false
+
+}
+
+})
+
+if(correct){
+
+score++
+
+}
+
+showResult()
+
+}
+
+/* =========================
+HASIL AKHIR
+========================= */
+
+function showResult(){
+
+let stars=""
+
+for(let i=0;i<score;i++){
+
+stars+="⭐"
+
+}
+
+let message=""
+
+if(score===5){
+
+message="Hebat! Kamu sudah besar!"
+
+}else if(score>=3){
+
+message="Bagus sekali!"
+
+}else{
+
+message="Ayo coba lagi!"
+
+}
+
+document.getElementById("app").innerHTML=`
+
+<h1>Hasil Akhir</h1>
+
+<div class="stars">${stars}</div>
+
+<p>${message}</p>
+
+<br>
+
+<button onclick="startGame()">Main Lagi</button>
+
+`
+
+}
+
+</script>
+
+</body>
+</html>
